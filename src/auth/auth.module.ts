@@ -1,17 +1,25 @@
 // src/auth/auth.module.ts
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsersModule } from 'src/users/users.module';
+import { ConfigModule } from '@nestjs/config';
+import { ConfigType } from '@nestjs/config';
+import appconfig from '../config/app.config';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'supersecret',
-      signOptions: { expiresIn: '1d' },
+    forwardRef(() => UsersModule), // 👈 cambio clave
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [appconfig.KEY],
+      useFactory: (config: ConfigType<typeof appconfig>) => ({
+        secret: config.jwt_secret,
+        signOptions: { expiresIn: '1d' },
+      }),
     }),
-    UsersModule, // si validas tokens a través del MS Usuarios
   ],
   providers: [AuthService, JwtAuthGuard],
   exports: [AuthService, JwtAuthGuard],
