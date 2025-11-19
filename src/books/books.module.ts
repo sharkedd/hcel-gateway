@@ -4,9 +4,11 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import appconfig from '../config/app.config';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     ClientsModule.registerAsync([
       {
         name: 'BOOKS_SERVICE',
@@ -17,7 +19,7 @@ import appconfig from '../config/app.config';
           options: {
             urls: [config.amqp_uri],
             // 🔸 puedes usar la misma cola o una específica para libros:
-            queue: process.env.RABBIT_BOOKS_QUEUE || config.book_queue,
+            queue: config.book_queue,
             queueOptions: {
               durable: false,
             },

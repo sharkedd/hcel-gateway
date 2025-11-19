@@ -1,26 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class BooksService {
-  create(createBookDto: CreateBookDto) {
-    return 'This action adds a new book';
+  constructor(@Inject('BOOKS_SERVICE') private readonly client: ClientProxy) {}
+
+  async createBook(dto: { title: string; createdBy: string; content: string }) {
+    return firstValueFrom(this.client.send({ cmd: 'create-book' }, dto));
   }
 
-  findAll() {
-    return `This action returns all books`;
+  async getAllBooks() {
+    return firstValueFrom(this.client.send({ cmd: 'books-get-all' }, {}));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async getBook(id: string) {
+    return firstValueFrom(this.client.send({ cmd: 'books-get-by-id' }, id));
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
+  async getContent(bookId: string) {
+    return firstValueFrom(this.client.send({ cmd: 'get-content' }, bookId));
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  async getFullBook(id: string) {
+    return firstValueFrom(this.client.send({ cmd: 'get-full-book' }, id));
+  }
+
+  async updateContent(dto: { bookId: string; body: string }) {
+    return firstValueFrom(this.client.send({ cmd: 'update-content' }, dto));
   }
 }
