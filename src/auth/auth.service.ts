@@ -12,4 +12,10 @@ export class AuthService {
       this.client.send({ cmd: 'validate_token' }, token),
     );
   }
+
+  async refreshToken(token: string) {
+    return await firstValueFrom(
+      this.client.send({ cmd: 'refresh_token' }, token),
+    );
+  }
 }
