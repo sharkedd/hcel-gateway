@@ -18,7 +18,7 @@ import { UpdateContentDto } from './dto/update-content.dto';
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
-  // 1️⃣ Crear libro (sin contenido todavía)
+  // 1️⃣ Crear libro
   @UseGuards(JwtAuthGuard)
   @Post()
   createBook(@Body() dto: { title: string; content: string }, @User() user) {
